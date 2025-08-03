@@ -1,131 +1,60 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
+/* eslint-disable semi */
+import NativeStackNavigation from './src/navigator/nativestacktab';
+import React, { useEffect, useState } from 'react';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import 'react-native-get-random-values';
+import SplashScreen from 'react-native-splash-screen';
+import LoadingScreen from './src/screeens/loadingscreen';
+import { AuthProvider } from './src/context/authcontext';
 
-import React from 'react';
-import type {PropsWithChildren} from 'react';
-import {
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+export default function App() {
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-type SectionProps = PropsWithChildren<{
-  title: string;
-}>;
 
-function Section({children, title}: SectionProps): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}>
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}>
-        {children}
-      </Text>
-    </View>
-  );
-}
+  useEffect(() => {
+    const initializeApp = async () => {
+      try {
+        const response = await fetch('https://gin-manajemen-stok-1lwf.vercel.app/ping');
+        const data = await response.json();
+        console.log(data);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        SplashScreen.hide();
+        setIsLoading(false);
+      }
+    };
 
-function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
+    initializeApp();
+  }, []);
 
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  /*
-   * To keep the template simple and small we're adding padding to prevent view
-   * from rendering under the System UI.
-   * For bigger apps the recommendation is to use `react-native-safe-area-context`:
-   * https://github.com/AppAndFlow/react-native-safe-area-context
-   *
-   * You can read more about it here:
-   * https://github.com/react-native-community/discussions-and-proposals/discussions/827
-   */
-  const safePadding = '5%';
+  if (isLoading) {
+    return <LoadingScreen />
+  }
 
   return (
-    <View style={backgroundStyle}>
-      <StatusBar
-        barStyle={isDarkMode ? 'light-content' : 'dark-content'}
-        backgroundColor={backgroundStyle.backgroundColor}
-      />
-      <ScrollView
-        style={backgroundStyle}>
-        <View style={{paddingRight: safePadding}}>
-          <Header/>
-        </View>
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-            paddingHorizontal: safePadding,
-            paddingBottom: safePadding,
-          }}>
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.tsx</Text> to change this
-            screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-          <Section title="Learn More">
-            Read the docs to discover what to do next:
-          </Section>
-          <LearnMoreLinks />
-        </View>
-      </ScrollView>
-    </View>
-  );
+    // <View>
+    //   <Text>heello world</Text>
+    // </View>
+    // <View>
+    //   <Text>heello world</Text>
+    //   <Button color={'blue'} title="Click Me" onPress={addInitialRoles} />
+    //   <Button color={'black'} title="Click Me" onPress={getAllRoles} />
+    //   <Button color={'purple'} title="Click Me" onPress={HanlderStore} />
+    //   <Button color={'red'} title="Click Me" onPress={handlePermission} />
+    //   {hasPermission && device != null ? <Camera style={styles.container} format={format} device={device} codeScanner={codeScanner} isActive={false}  fps={15}  /> : <Text>Camera permission not granted</Text>}
+    //   {/* {barcodes.map((barcode, idx) => (
+    //     <Text key={idx} style={styles.barcodeTextURL}>
+    //       {barcode.displayValue}
+    //     </Text>
+    //   ))} */}
+    // </View>
+    <SafeAreaProvider>
+      <AuthProvider>
+        <NativeStackNavigation />
+      </AuthProvider>
+    </SafeAreaProvider>
+
+  )
 }
-
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
-
-export default App;

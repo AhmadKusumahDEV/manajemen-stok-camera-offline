@@ -1,0 +1,276 @@
+select  s.name as size , i.quantity  from inventory as i join product as p on i.code_product = p.product_code join size as s on i.id_size = s.id where code_warehouse = '1ef3ebc0-a1c0-6abc-b3b4-aabbccddeeff'  and code_product = '1ef3edfa-11a0-6abc-b3b4-ccddeeff1122'
+
+select p.product_name, i.code_product , c.name as category ,sum(i.quantity) as total_product from inventory as i join product as p on i.code_product = p.product_code join category as c on p.id_category = c.id WHERE i.code_warehouse = '1ef3ebc0-a1c0-6abc-b3b4-aabbccddeeff' GROUP by i.code_product ,p.product_name
+
+`SELECT
+    e.employee_code,
+    r.role_name,
+    w.warehouse_code
+FROM
+    employee AS e
+INNER JOIN
+    role AS r ON e.id_role = r.id
+LEFT JOIN 
+    warehouse AS w ON e.employee_code = w.empy_code
+WHERE
+    e.user_id = ? 
+    AND e.password = ?;`
+
+
+Transaksi 1: Transfer dari Jakarta ke Surabaya (Completed)
+INSERT INTO transactions (code_transaksi, origin_warehouse_name, destination_warehouse_name, employee_code, id_status)
+VALUES ('#TRF837201', 'WH-01', 'WH-03', '1ef3eb94-08e0-611f-b3b4-001122334455', 3);
+-- Detail untuk Transaksi 1
+INSERT INTO detail_transactions (id_transaction, id_detail_product, quantity, scanner_quantity)
+VALUES (1, 2, 10, 10); -- Kemeja Flanel, M (id_detail_product = 2)
+INSERT INTO detail_transactions (id_transaction, id_detail_product, quantity, scanner_quantity, defective_quantity, defective_description)
+VALUES (1, 3, 15, 14, 1, '1 kancing lepas'); -- Kemeja Flanel, L (id_detail_product = 3), ada 1 rusak
+
+-- Transaksi 2: Penerimaan Stok Baru di WH-03 (Completed)
+INSERT INTO transactions (code_transaksi, origin_warehouse_name, destination_warehouse_name, employee_code, id_status)
+VALUES ('#RCV559134', 'WH-03', NULL, '1ef3eb97-08c0-6c9c-b3b4-001122334455', 3);
+-- Detail untuk Transaksi 2
+INSERT INTO detail_transactions (id_transaction, id_detail_product, quantity, scanner_quantity)
+VALUES (2, 18, 30, 30); -- Celana Jogger, S (id_detail_product = 18)
+INSERT INTO detail_transactions (id_transaction, id_detail_product, quantity, scanner_quantity)
+VALUES (2, 19, 50, 50); -- Celana Jogger, M (id_detail_product = 19)
+
+-- Transaksi 3: Transfer dari WH-02 ke WH-04 (Pending)
+INSERT INTO transactions (code_transaksi, origin_warehouse_name, destination_warehouse_name, employee_code, id_status)
+VALUES ('#TRF910238', 'WH-02', 'WH-04', '1ef3eb95-a240-6aab-b3b4-001122334455', 2);
+-- Detail untuk Transaksi 3
+INSERT INTO detail_transactions (id_transaction, id_detail_product, quantity)
+VALUES (3, 11, 25); -- Celana Jeans, L (id_detail_product = 11), belum di-scan
+
+-- Transaksi 4: Transfer dari WH-01 ke WH-05 (Failed)
+INSERT INTO transactions (code_transaksi, origin_warehouse_name, destination_warehouse_name, employee_code, id_status)
+VALUES ('#TRF448190', 'WH-01', 'WH-05', '1ef3eb98-1f60-6e4d-b3b4-001122334455', 1);
+-- Detail untuk Transaksi 4
+INSERT INTO detail_transactions (id_transaction, id_detail_product, quantity, defective_quantity, defective_description)
+VALUES (4, 16, 40, 40, 'Pengiriman ditolak oleh tujuan, semua item dianggap defect untuk sementara'); -- Polo Shirt, M (id_detail_product = 16)
+
+-- Transaksi 5: Penyesuaian Stok di WH-01 (Completed)
+INSERT INTO transactions (code_transaksi, origin_warehouse_name, destination_warehouse_name, employee_code, id_status)
+VALUES ('#ADJ112358', 'WH-01', NULL, '1ef3eb99-4410-6ffb-b3b4-001122334455', 3);
+-- Detail untuk Transaksi 5
+INSERT INTO detail_transactions (id_transaction, id_detail_product, quantity, defective_quantity, defective_description)
+VALUES (5, 6, -5, 5, 'Ditemukan 5 pcs robek saat stock opname'); -- Kaos Polos, M (id_detail_product = 6)
+
+
+
+count transaction for each warehouse 
+select count(*) as transaksi from transactions as t join warehouse as w on t.origin_warehouse_name = w.warehouse_name where t.origin_warehouse_name = 'WH-01'
+
+
+INSERT INTO employee (user_id, employee_name, password, employee_code, id_role) 
+VALUES ('10234567', 'Budi Santoso', '$2b$10$AbcdeFGHIjklmNOPQRstUu.VwXyZaBcDeFgHiJkLmNoPqRs', '1ef3eb94-08e0-611f-b3b4-001122334455', 2);
+
+INSERT INTO warehouse (warehouse_name, warehouse_code, location_description)
+VALUES (
+    'WH-01',
+    '1ef3ebc0-a1c0-6abc-b3b4-aabbccddeeff', -- UUIDv6 berurutan #1
+    'Gudang Pusat Jakarta - Area Penerimaan Barang, Jl. Industri Raya No. 1, Jakarta Timur'
+);
+
+-- Data 2
+INSERT INTO warehouse (warehouse_name, warehouse_code, location_description)
+VALUES (
+    'WH-02',
+    '1ef3ebc1-b820-6cde-b3b4-aabbccddeeff', -- UUIDv6 berurutan #2
+    'Gudang Cabang Surabaya - Penyimpanan Produk Fashion, Jl. Margomulyo Indah No. 15, Surabaya'
+);
+
+-- Data 3
+INSERT INTO warehouse (warehouse_name, warehouse_code, location_description)
+VALUES (
+    'WH-03',
+    '1ef3ebc2-d010-6f4a-b3b4-aabbccddeeff', -- UUIDv6 berurutan #3
+    'Pusat Distribusi Bandung - Sektor A, Jl. Soekarno-Hatta No. 45, Bandung'
+);
+
+-- Data 4
+INSERT INTO warehouse (warehouse_name, warehouse_code, location_description)
+VALUES (
+    'WH-04',
+    '1ef3ebc3-f990-611b-b3b4-aabbccddeeff', -- UUIDv6 berurutan #4
+    'Gudang Transit Medan - Khusus Pengiriman Sumatera, Jl. Gatot Subroto Km. 5, Medan'
+);
+
+-- Data 5
+INSERT INTO warehouse (warehouse_name, warehouse_code, location_description)
+VALUES (
+    'WH-05',
+    '1ef3ebc5-0330-6a3c-b3b4-aabbccddeeff', -- UUIDv6 berurutan #5
+    'Gudang Retail Makassar - Stok Toko Area Timur, Jl. Urip Sumoharjo No. 99, Makassar'
+);
+
+
+-- Data 1 (Shirt)
+INSERT INTO product (product_name, price, description_product, product_code, id_category)
+VALUES (
+    'Kemeja Flanel Kotak Merah',
+    250000,
+    'Kemeja flanel lengan panjang dengan bahan katun premium, nyaman dipakai sehari-hari. Pola kotak-kotak klasik warna merah dan hitam.',
+    '1ef3edfa-11a0-6abc-b3b4-ccddeeff1122', -- UUIDv6 #1
+    1
+);
+
+-- Data 2 (Shirt)
+INSERT INTO product (product_name, price, description_product, product_code, id_category)
+VALUES (
+    'Kaos Polos Basic Putih',
+    120000,
+    'Kaos oblong basic warna putih bersih, bahan 100% cotton combed 30s yang adem dan menyerap keringat. Cocok untuk semua gaya.',
+    '1ef3edfb-28b0-6cde-b3b4-ccddeeff1122', -- UUIDv6 #2
+    1
+);
+
+-- Data 3 (Pants)
+INSERT INTO product (product_name, price, description_product, product_code, id_category)
+VALUES (
+    'Celana Chino Slim-Fit Khaki',
+    350000,
+    'Celana chino dengan potongan slim-fit modern, warna khaki yang serbaguna. Bahan katun twill stretch untuk kenyamanan bergerak.',
+    '1ef3edfc-3010-6f4a-b3b4-ccddeeff1122', -- UUIDv6 #3
+    2
+);
+
+-- Data 4 (Pants)
+INSERT INTO product (product_name, price, description_product, product_code, id_category)
+VALUES (
+    'Celana Jeans Straight-Cut Biru Tua',
+    450000,
+    'Celana jeans denim klasik dengan potongan lurus (straight-cut). Warna biru tua dengan efek washed ringan. Tahan lama dan tak lekang oleh waktu.',
+    '1ef3edfd-4990-611b-b3b4-ccddeeff1122', -- UUIDv6 #4
+    2
+);
+
+-- Data 5 (Shirt)
+INSERT INTO product (product_name, price, description_product, product_code, id_category)
+VALUES (
+    'Kemeja Batik Lengan Pendek Parang',
+    325000,
+    'Kemeja batik modern dengan motif Parang. Bahan katun primisima yang halus dan adem, cocok untuk acara formal maupun kasual.',
+    '1ef3edfe-5330-6a3c-b3b4-ccddeeff1122', -- UUIDv6 #5
+    1
+);
+
+-- Data 6 (Pants)
+INSERT INTO product (product_name, price, description_product, product_code, id_category)
+VALUES (
+    'Celana Kargo Hitam Tactical',
+    380000,
+    'Celana kargo tactical dengan banyak saku fungsional. Bahan ripstop yang kuat dan ringan, warna hitam pekat.',
+    '1ef3edff-6c40-6b8d-b3b4-ccddeeff1122', -- UUIDv6 #6
+    2
+);
+
+-- Data 7 (Shirt)
+INSERT INTO product (product_name, price, description_product, product_code, id_category)
+VALUES (
+    'Polo Shirt Biru Navy',
+    185000,
+    'Kaos polo dengan kerah, warna biru navy. Bahan lacoste pique yang bertekstur dan elegan untuk tampilan smart-casual.',
+    '1ef3ee00-7a50-6e9f-b3b4-ccddeeff1122', -- UUIDv6 #7
+    1
+);
+
+-- Data 8 (Pants)
+INSERT INTO product (product_name, price, description_product, product_code, id_category)
+VALUES (
+    'Celana Jogger Abu-abu Muda',
+    280000,
+    'Celana jogger sporty dengan karet di bagian pinggang dan pergelangan kaki. Bahan fleece yang lembut, warna abu-abu muda (light grey).',
+    '1ef3ee01-8f60-610a-b3b4-ccddeeff1122', -- UUIDv6 #8
+    2
+);
+
+-- Data 9 (Shirt)
+INSERT INTO product (product_name, price, description_product, product_code, id_category)
+VALUES (
+    'Kemeja Oxford Lengan Panjang Biru Langit',
+    295000,
+    'Kemeja formal bahan katun oxford yang tidak mudah kusut. Warna biru langit yang profesional, cocok untuk kerja kantor.',
+    '1ef3ee02-9a70-6c1b-b3b4-ccddeeff1122', -- UUIDv6 #9
+    1
+);
+
+-- Data 10 (Pants)
+INSERT INTO product (product_name, price, description_product, product_code, id_category)
+VALUES (
+    'Celana Pendek Chino Cream',
+    210000,
+    'Celana pendek chino selutut dengan bahan katun yang nyaman. Warna cream netral yang mudah dipadukan.',
+    '1ef3ee03-a480-6d2c-b3b4-ccddeeff1122', -- UUIDv6 #10
+    2
+);
+
+-- Produk 1: Kemeja Flanel Kotak Merah ('1ef3edfa-11a0-6abc-b3b4-ccddeeff1122')
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3edfa-11a0-6abc-b3b4-ccddeeff1122', 1, '8990010010012'); -- Size S
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3edfa-11a0-6abc-b3b4-ccddeeff1122', 2, '8990010010029'); -- Size M
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3edfa-11a0-6abc-b3b4-ccddeeff1122', 3, '8990010010036'); -- Size L
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3edfa-11a0-6abc-b3b4-ccddeeff1122', 4, '8990010010043'); -- Size XL
+
+-- Produk 2: Kaos Polos Basic Putih ('1ef3edfb-28b0-6cde-b3b4-ccddeeff1122')
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3edfb-28b0-6cde-b3b4-ccddeeff1122', 1, '8990010020011'); -- Size S
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3edfb-28b0-6cde-b3b4-ccddeeff1122', 2, '8990010020028'); -- Size M
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3edfb-28b0-6cde-b3b4-ccddeeff1122', 3, '8990010020035'); -- Size L
+
+-- Produk 3: Celana Chino Slim-Fit Khaki ('1ef3edfc-3010-6f4a-b3b4-ccddeeff1122')
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3edfc-3010-6f4a-b3b4-ccddeeff1122', 2, '8990010030027'); -- Size M
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3edfc-3010-6f4a-b3b4-ccddeeff1122', 3, '8990010030034'); -- Size L
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3edfc-3010-6f4a-b3b4-ccddeeff1122', 4, '8990010030041'); -- Size XL
+
+-- Produk 4: Celana Jeans Straight-Cut Biru Tua ('1ef3edfd-4990-611b-b3b4-ccddeeff1122')
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3edfd-4990-611b-b3b4-ccddeeff1122', 2, '8990010040026'); -- Size M
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3edfd-4990-611b-b3b4-ccddeeff1122', 3, '8990010040033'); -- Size L
+
+-- Produk 5: Kemeja Batik Lengan Pendek Parang ('1ef3edfe-5330-6a3c-b3b4-ccddeeff1122')
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3edfe-5330-6a3c-b3b4-ccddeeff1122', 2, '8990010050025'); -- Size M
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3edfe-5330-6a3c-b3b4-ccddeeff1122', 3, '8990010050032'); -- Size L
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3edfe-5330-6a3c-b3b4-ccddeeff1122', 4, '8990010050049'); -- Size XL
+
+-- Produk 6: Celana Kargo Hitam Tactical ('1ef3edff-6c40-6b8d-b3b4-ccddeeff1122')
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3edff-6c40-6b8d-b3b4-ccddeeff1122', 3, '8990010060031'); -- Size L
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3edff-6c40-6b8d-b3b4-ccddeeff1122', 4, '8990010060048'); -- Size XL
+
+-- Produk 7: Polo Shirt Biru Navy ('1ef3ee00-7a50-6e9f-b3b4-ccddeeff1122')
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3ee00-7a50-6e9f-b3b4-ccddeeff1122', 1, '8990010070018'); -- Size S
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3ee00-7a50-6e9f-b3b4-ccddeeff1122', 2, '8990010070025'); -- Size M
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3ee00-7a50-6e9f-b3b4-ccddeeff1122', 3, '8990010070032'); -- Size L
+
+-- Produk 8: Celana Jogger Abu-abu Muda ('1ef3ee01-8f60-610a-b3b4-ccddeeff1122')
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3ee01-8f60-610a-b3b4-ccddeeff1122', 1, '8990010080017'); -- Size S
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3ee01-8f60-610a-b3b4-ccddeeff1122', 2, '8990010080024'); -- Size M
+
+-- Produk 9: Kemeja Oxford Lengan Panjang Biru Langit ('1ef3ee02-9a70-6c1b-b3b4-ccddeeff1122')
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3ee02-9a70-6c1b-b3b4-ccddeeff1122', 2, '8990010090023'); -- Size M
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3ee02-9a70-6c1b-b3b4-ccddeeff1122', 3, '8990010090030'); -- Size L
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3ee02-9a70-6c1b-b3b4-ccddeeff1122', 4, '8990010090047'); -- Size XL
+
+-- Produk 10: Celana Pendek Chino Cream ('1ef3ee03-a480-6d2c-b3b4-ccddeeff1122')
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3ee03-a480-6d2c-b3b4-ccddeeff1122', 2, '8990010100028'); -- Size M
+INSERT INTO product_detail (code_product, id_size, barcode) VALUES ('1ef3ee03-a480-6d2c-b3b4-ccddeeff1122', 3, '8990010100035'); -- Size L
+
+
+
+INSERT INTO employee (user_id, employee_name, password, employee_code, id_role, warehouse_code) 
+VALUES ('10234567', 'Budi Santoso', 'manager', '1ef3eb94-08e0-611f-b3b4-001122334455', 2, '1ef3ebc0-a1c0-6abc-b3b4-aabbccddeeff');
+
+INSERT INTO employee (user_id, employee_name, password, employee_code, id_role, warehouse_code) 
+VALUES ('14739436', 'sofyan', 'admin', '1ef3eb95-a240-6aab-b3b4-001122334455', 1, '1ef3ebc1-b820-6cde-b3b4-aabbccddeeff');
+
+INSERT INTO employee (user_id, employee_name, password, employee_code, id_role, warehouse_code) 
+VALUES ('84026482', 'ahmed', 'staff', '1ef3eb97-08c0-6c9c-b3b4-001122334455', 3, '1ef3ebc2-d010-6f4a-b3b4-aabbccddeeff');
+
+INSERT INTO employee (user_id, employee_name, password, employee_code, id_role, warehouse_code) 
+VALUES ('93075971', 'ahmadkusumah', 'staff', '1ef3eb98-1f60-6e4d-b3b4-001122334455', 3, '1ef3ebc3-f990-611b-b3b4-aabbccddeeff');
+
+INSERT INTO employee (user_id, employee_name, password, employee_code, id_role, warehouse_code) 
+VALUES ('84088482', 'sam', 'admin', '1ef3eb99-4410-6ffb-b3b4-001122334455', 1, '1ef3ebc5-0330-6a3c-b3b4-aabbccddeeff');
+
+INSERT into employee (user_id,employee_name,password,employee_code,id_role,warehouse_code) VALUES ('849207581', 'admin','admin','20250719-112649-0001-8a7fb2cd34e1', 1, '1ef3ebc1-b820-6cde-b3b4-aabbccddeeff');
+
+INSERT into employee (user_id,employee_name,password,employee_code,id_role,warehouse_code) VALUES ('558932562', 'manager','manager','0250719-112649-0002-a14c89ef567d', 2, '1ef3ebc1-b820-6cde-b3b4-aabbccddeeff');
+
+INSERT into employee (user_id,employee_name,password,employee_code,id_role,warehouse_code) VALUES ('888937656', 'staff','staff','20250719-112649-0003-d4ff23bd8912', 3, '1ef3ebc1-b820-6cde-b3b4-aabbccddeeff');
